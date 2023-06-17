@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "lib": ["es5", "es6", "dom"],
+    "outDir": "dist",
+    "rootDir": "."
+  },
+  "include": ["./src/**/*", "index.ts"]
+}

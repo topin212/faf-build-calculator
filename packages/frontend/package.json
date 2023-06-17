@@ -1,0 +1,46 @@
+{
+  "name": "frontend",
+  "packageManager": "yarn@3.5.0",
+  "dependencies": {
+    "cra-template-typescript": "1.2.0",
+    "eslint-config-react-app": "^7.0.1",
+    "library": "workspace:^",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^3.3.0"
+  },
+  "devDependencies": {
+    "@aws-amplify/cli": "^11.0.3",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^14.0.0",
+    "@types/eslint": "^8",
+    "@types/jest": "^29.5.0",
+    "@types/node": "^18.15.11",
+    "@types/react": "^18.0.31",
+    "@types/react-dom": "^18.0.11",
+    "@types/testing-library__jest-dom": "^5",
+    "aws-amplify": "^5.0.23",
+    "eslint": "^8.37.0",
+    "typescript": "^5.0.3"
+  },
+  "scripts": {
+    "start": "WATCHPACK_POLLING=true react-scripts start",
+    "build": "yarn react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "configure1": "yarn amplify configure"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

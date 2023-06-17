@@ -1,0 +1,19 @@
+{
+  "name": "library",
+  "version": "0.0.1",
+  "packageManager": "yarn@3.5.0",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "yarn webpack"
+  },
+  "devDependencies": {
+    "pnp-webpack-plugin": "^1.7.0",
+    "ts-loader": "^9.4.2",
+    "typescript": "^5.0.2",
+    "webpack": "^5.77.0",
+    "webpack-cli": "^5.0.1"
+  },
+  "dependencies": {
+    "date-fns": "^2.29.3"
+  }
+}

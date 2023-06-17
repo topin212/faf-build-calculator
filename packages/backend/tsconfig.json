@@ -1,0 +1,12 @@
+{
+  "extends":"../tsconfig.style.json",
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "outDir": "dist/",
+    "lib": ["ES2015", "DOM"],
+    "rootDir": "."
+  },
+  "include": ["./src/"]
+}
