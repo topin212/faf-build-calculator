@@ -1,15 +1,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
+import './styles/index.css';
+import './styles/MainContent.css';
+
 import reportWebVitals from './reportWebVitals';
+import { NavigationBar } from "./components/Navbar"
+import 'bootstrap/dist/css/bootstrap.min.css';
+import {ProjectRouter} from './components/Router';
+
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <App />
+    <NavigationBar />
+    
+    <div className="App">
+      <ProjectRouter />
+    </div>
+    
   </React.StrictMode>
 );
 

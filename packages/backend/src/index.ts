@@ -13,7 +13,7 @@ export async function lambdaHandler (event: APIGatewayEvent, context: Context): 
   };
 };
 
-export function d (event: APIGatewayEvent, context: Context): APIGatewayProxyResult {
+export function d(event: APIGatewayEvent, context: Context): APIGatewayProxyResult {
   console.log(`Event: ${JSON.stringify(event, null, 2)}`);
   console.log(`Context: ${JSON.stringify(context, null, 2)}`);
 

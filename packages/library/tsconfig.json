@@ -1,10 +1,12 @@
 {
   "compilerOptions": {
+    "rootDir": ".",
     "module": "CommonJS",
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "lib": ["es5", "es6", "dom"],
-    "outDir": "dist",
-    "rootDir": "."
+    "outDir": "dist/",
+    "types": ["node" ,"reflect-metadata", "jest", "@types/jest"],
   },
   "include": ["./src/**/*", "index.ts"]
 }

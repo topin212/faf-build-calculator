@@ -1,4 +1,4 @@
-service: backend
+service: faf-calculator-backend
 frameworkVersion: "3"
 
 plugins: 

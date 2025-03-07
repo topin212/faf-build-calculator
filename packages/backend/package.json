@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "faf-calculator-backend",
   "packageManager": "yarn@3.5.0",
   "scripts": {
     "build": "echo 'Building backend' && yarn webpack --config ./webpack.config.js",
