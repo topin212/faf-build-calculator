@@ -4,15 +4,31 @@ import {
   SpendingRate,
   getSpendingRate,
   secondsToHumanReadableString,
-  getSpendingRateWithBuildpower,
 } from "../../../mocks/economy/SpendingRate";
 import { Container, Button, Form, Row, Col } from "react-bootstrap";
+import { EconomySimulator, SimulationStateStep } from "../../../mocks/economy/Simulator";
+
 import {
-  VictoryChart,
-  VictoryLine,
-  VictoryTheme,
-  VictoryLegend,
-} from "victory";
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js'
+import { Line } from 'react-chartjs-2'
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+)
 
 interface ResourceExtrapolatorProps {
   actualCost: EconomyValue;
@@ -75,7 +91,6 @@ export class ResourceExtrapolator extends Component<
       buildpower: 0,
       initialMassStore: 0,
       resolution: 1,
-      // spendingRate: getZeroSpendingRate()
     };
   }
 
@@ -87,61 +102,25 @@ export class ResourceExtrapolator extends Component<
     });
   }
 
-  simulate(spending: SpendingRate): [Array<number>, Array<number>] {
-    //safeguard against invalid starting data
-    if (
-      this.props.production.buildpower == 0 ||
-      spending.time == 0 ||
-      spending.rate.mass == 0 ||
-      spending.rate.mass == Infinity
-    ) {
-      return [[], []];
-    }
-
-    //ensure that the data for the graph always has enough mass to run
-    let startingStorage = this.state.initialMassStore;
-    //   this.state.initialMassStore > this.props.actualCost.mass
-    //     ? this.state.initialMassStore
-    //     : this.props.actualCost.mass;
-
-    //initiate the state of the simulation:
-    let result = [startingStorage];
-    let remainingCost = this.props.actualCost.mass;
-
-    let resolution = this.state.resolution ? this.state.resolution : 1;
-
-    let massIncome =
-      this.props.production.mass > 0
-        ? this.props.production.mass * resolution
-        : 1;
-
-    let massSpendRate = spending.rate.mass * resolution;
-
-    let debugging = [remainingCost];
-    for (let i = 1; remainingCost > 0; i++) {
-      let previousMassStorage = result[i - 1];
-      let newMassStorage = previousMassStorage + massIncome;
-
-      //spending for this tick is equal
-      let incomeOrRate =
-        newMassStorage >= massSpendRate ? massSpendRate : newMassStorage; //should this be whatever is in the storage instead?
-
-      let afterConsumption = newMassStorage - incomeOrRate;
-
-      remainingCost -= incomeOrRate;
-      console.log(incomeOrRate);
-      debugging.push(remainingCost);
-      result.push(afterConsumption);
-    }
-    return [result, debugging];
-  }
-
   render(): ReactNode {
-    // let spendingRate = getSpendingRate(this.props.actualCost, this.props.production, this.state.buildpower)
-    let spendingRate = getSpendingRateWithBuildpower(
-      this.props.actualCost,
-      this.state.buildpower
-    );
+    let spendingRate = 
+      getSpendingRate(
+        this.props.actualCost, 
+        this.props.production)
+
+    let simulator: EconomySimulator = new EconomySimulator(
+      this.props.actualCost, 
+      this.props.production, 
+      {
+        mass: this.state.initialMassStore, 
+        energy: this.props.actualCost.energy, 
+        buildpower: this.state.buildpower
+      },
+    false, 
+    this.state.resolution)
+    simulator.prepareSimulation();
+    simulator.simulate();
+    // console.table(simulator.getLastSimulationResults())
     return (
       <Container fluid>
         <Row>
@@ -158,57 +137,40 @@ export class ResourceExtrapolator extends Component<
             <p>{`mass: ${spendingRate.rate.mass}`}</p>
             <p>{`energy: ${spendingRate.rate.energy}`}</p>
             <p>{`buildpower: ${spendingRate.rate.buildpower}`}</p>
+            <p>{`energy per mass: ${spendingRate.energyPerMass}`}</p>
+
             <Button>Visualize</Button>
           </Col>
           <Col>
-            <VictoryChart colorScale={"cool"} theme={VictoryTheme.clean}>
-              <VictoryLine
-                style={{
-                  data: {
-                    stroke: "blue",
+            <Line
+              datasetIdKey="123"
+              data = {{
+                labels  : [1,2,3,4,5,6,7,8,9,10],
+                datasets: [
+                  {
+                    label: 'Mass Store',
+                    borderColor: "green",
+                    data: simulator.getLastSimulationResults().map(step => step.resourceStorage.mass)
                   },
-                }}
-                interpolation="linear"
-                minDomain={{ y: -100, x: 0 }}
-                maxDomain={{ x: 10 }}
-                data={this.simulate(spendingRate)[0].map((d, i) => ({
-                  x: i,
-                  y: d,
-                }))}
-              />
-              <VictoryLine
-                style={{
-                  data: {
-                    stroke: "red",
+                  {
+                    label: 'Energy Store',
+                    borderColor: "yellow",
+                    data: simulator.getLastSimulationResults().map(step => step.resourceStorage.energy)
                   },
-                }}
-                interpolation="linear"
-                minDomain={{ y: -100, x: 0 }}
-                maxDomain={{ x: 10 }}
-                data={this.simulate(spendingRate)[1].map((d, i) => ({
-                  x: i,
-                  y: d,
-                }))}
-              />
-              <VictoryLegend
-              orientation="horizontal"
-              x = {150}
-              data={[
-                {
-                  name: "Cost",
-                  symbol: {
-                    fill: "red",
+                  {
+                    label: 'Mass Cost',
+                    borderColor: "darkgreen",
+                    data: simulator.getLastSimulationResults().map(step => step.costSatisfaction.mass)
                   },
-                },
-                {
-                  name: "Storage",
-                  symbol: {
-                    fill: "Blue",
-                  },
-                },
-              ]}
-            />
-            </VictoryChart>
+                  {
+                    label: 'energy cost',
+                    borderColor: "orange",
+                    data: simulator.getLastSimulationResults().map(step => step.costSatisfaction.energy)
+                  }
+                ]
+              }}>
+
+            </Line>
             <Form.Label>{`Buildpower: ${this.state.buildpower}`}</Form.Label>
             <Form.Range
               onChange={(e) =>
@@ -220,18 +182,21 @@ export class ResourceExtrapolator extends Component<
             />
             <Form.Label>{`Initial mass storage: ${this.state.initialMassStore}`}</Form.Label>
             <Form.Range
-              onChange={(e) =>
+              onChange={(e) => {
+                let value = parseInt(e.target.value, 10)
+
                 this.updateStateKey(
                   "initialMassStore",
-                  parseInt(e.target.value, 10) * 10
+                  value == 100? this.props.actualCost.mass : value * 10
                 )
+                }
               }
             />
             <Form.Select
               onChange={(e) =>
                 this.updateStateKey(
                   "resolution",
-                  1 / parseInt(e.target.value, 10)
+                  parseInt(e.target.value, 10)
                 )
               }
             >
@@ -241,16 +206,6 @@ export class ResourceExtrapolator extends Component<
               <option value="3">3x</option>
             </Form.Select>
           </Col>
-        </Row>
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <Row>
-          {JSON.stringify(this.simulate(spendingRate)[0])}
-          {JSON.stringify(this.simulate(spendingRate)[1])}
         </Row>
       </Container>
     );

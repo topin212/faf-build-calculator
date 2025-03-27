@@ -3,6 +3,7 @@ import { EconomyValue, getZeroCost } from '../Typings';
 export interface SpendingRate {
   time: number
   rate: EconomyValue
+  energyPerMass: number
 }
 
 const safeDivision = (a: number, b: number) => 
@@ -14,30 +15,18 @@ export function getSpendingRate(
   production: EconomyValue, 
   additionalBuildpower = 0): SpendingRate {
     let time = cost.buildpower / (production.buildpower + additionalBuildpower)
-    let safeDivision = (a: number, b: number) => b !== 0? a/b : Infinity 
+    let massRate = safeDivision(cost.mass, time);
+    let energyRate = safeDivision(cost.energy, time)
+    let buildpowerRate = safeDivision(cost.buildpower, time);
     return {
       time,
       rate: {
-        mass:       safeDivision(cost.mass  , time),
-        energy:     safeDivision(cost.energy, time),
-        buildpower: safeDivision(cost.buildpower , time),
-      }
+        mass:       massRate,
+        energy:     energyRate,
+        buildpower: buildpowerRate,
+      },
+      energyPerMass: safeDivision(energyRate, massRate)
     }
-}
-
-export function getSpendingRateWithBuildpower(
-  cost: EconomyValue,
-  buildpower: number
-): SpendingRate {
-  let time = cost.buildpower / (buildpower)
-  return {
-    time,
-    rate: {
-      mass:       safeDivision(cost.mass  , time),
-      energy:     safeDivision(cost.energy, time),
-      buildpower: safeDivision(cost.buildpower , time),
-    }
-  }
 }
 
 export function getZeroSpendingRate() {

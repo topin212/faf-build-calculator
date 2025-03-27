@@ -52,6 +52,26 @@ export interface EconomyValue {
   buildpower: number
 }
 
+export function hasValues(a: EconomyValue): boolean {
+  return a.mass > 0 && a.energy > 0 && a.buildpower > 0
+}
+
+export function isCostSatisfied(a: EconomyValue): boolean {
+  return a.mass <= 0 && a.energy <= 0
+}
+
+export function isNegative(a: EconomyValue): boolean {
+  return a.mass <= 0 || a.energy <= 0
+}
+
+export function negate(a: EconomyValue): EconomyValue {
+  return {
+    mass: -a.mass,
+    energy: -a.energy,
+    buildpower: a.buildpower
+  }
+}
+
 export function addCosts(a?: EconomyValue, b?: EconomyValue): EconomyValue {
   if (!a && !b) {
     return getZeroCost();
@@ -62,7 +82,6 @@ export function addCosts(a?: EconomyValue, b?: EconomyValue): EconomyValue {
   if (!a) {
     return b;
   }
-
 
   return {
     mass: a.mass + b.mass,

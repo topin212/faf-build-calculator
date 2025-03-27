@@ -34,7 +34,7 @@ export class UnitList extends Component<UnitListProps, UnitListState>{
 
     return (
       filtered.map((unit) => (
-        <Card style={{ width: '18rem' }}>
+        <Card style={{ width: '18rem', padding: "5px  "}}>
         <Card.Body>
           <Card.Title>{unit.name}</Card.Title>
           <Card.Subtitle className="mb-2 text-muted">{getName(unit)}</Card.Subtitle>

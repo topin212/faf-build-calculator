@@ -49,14 +49,31 @@ export class ResourceRequirementCalculator extends Component<
     });
 
     let totalProduction = Array.from(units.values())
-      .map(([unit, number]) => multiplyCost(unit.produces, number))
-      .reduce((acc, v) => addCosts(acc, v));
+      .map(([unit, amount]) => multiplyCost(unit.produces, amount))
+      .reduce((acc, v) => addCosts(acc, v), getZeroCost());
 
     this.setState({
       selectedUnits: units,
       costs: totalCost,
       production: totalProduction,
     });
+  }
+
+  public removeSelectedUnit(
+    unitName: string
+  ) {
+    console.log(`deleting ${JSON.stringify(unitName)}`)
+    this.state.selectedUnits.delete(unitName)
+    if(this.state.selectedUnits.has(unitName)) {
+      let unitDescrtipion = this.state.selectedUnits.get(unitName);
+      let numberOfUnit = unitDescrtipion[1]
+      if(numberOfUnit > 1) {
+        this.state.selectedUnits.set(unitName, [unitDescrtipion[0], numberOfUnit - 1])
+      } else {
+        this.state.selectedUnits.delete(unitName);
+      }
+    }
+    this.setSelectedUnits(this.state.selectedUnits);
   }
 
   getSelectedUnitCost(units: Array<[UnitDefinition, number]>): EconomyValue {
@@ -71,7 +88,7 @@ export class ResourceRequirementCalculator extends Component<
 
         <Row>
           <Col>
-            <SelectedUnitDisplay selectedUnits={this.state.selectedUnits}/>
+            <SelectedUnitDisplay unitRemoval={(unit) => this.removeSelectedUnit(unit)} selectedUnits={this.state.selectedUnits}/>
           </Col>
           <Col>
             <EconomyDisplay displayValue={this.state.costs} tooltip="Total unit cost:"/>
